@@ -1,23 +1,29 @@
 package osu.beatmap;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import osu.beatmap.difficulty.DifficultySection;
 import osu.beatmap.editor.EditorSection;
 import osu.beatmap.event.EventSection;
+import osu.beatmap.event.Sample;
 import osu.beatmap.general.GeneralSection;
+import osu.beatmap.hitobject.HitObject;
 import osu.beatmap.hitobject.HitObjectSection;
 import osu.beatmap.metadata.MetadataSection;
 import osu.beatmap.timing.TimingSection;
@@ -25,11 +31,11 @@ import osu.beatmap.timing.TimingSection;
 public final class Beatmap {
 
 	// Instance Variables
-	private int OsuVersion = 14;
+	private int OSU_VERSION = 14;
 
 	private List<Section> sections = new ArrayList<>();
 
-	private static final String nl = BeatmapUtils.nl;
+	private static final String NEW_LINE = BeatmapUtils.nl;
 
 	public Beatmap() {
 		sections.add(new GeneralSection());
@@ -49,7 +55,7 @@ public final class Beatmap {
 		}
 
 		String text = "";
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
 			String line;
 			// read line by line
 			while ((line = br.readLine()) != null) {
@@ -57,7 +63,7 @@ public final class Beatmap {
 
 			}
 			if (text.contains("osu file format")) {
-				OsuVersion = Integer.parseInt(text.split(System.lineSeparator())[0].split("osu file format v")[1]);
+				OSU_VERSION = Integer.parseInt(text.split(System.lineSeparator())[0].split("osu file format v")[1]);
 			}
 
 			// separate to sections
@@ -74,11 +80,9 @@ public final class Beatmap {
 			// Set up HitObject hs based on timing points
 			getHitObjectSection().addTimingHitsound(getTimingSection());
 
-		} catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException | FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		} 
 	}
 
 	public GeneralSection getGeneralSection() {
@@ -114,14 +118,34 @@ public final class Beatmap {
 		if (section2 == null) {
 			return split1;
 		}
-		String split2 = split1.split(Pattern.quote(section2.getHeader()))[0];
-		return split2;
+		return split1.split(Pattern.quote(section2.getHeader()))[0];
 	}
 	
-	public Set<Chord> getChords(){
-		Set<Chord> chords = new TreeSet<>();
-		//TODO
-		return chords;
+	public Map<Long, Chord> getChords(){
+		Map<Long, Chord> output = new TreeMap<>();
+		for (Sample sample : getEventSection().getSamples()) {
+			Chord chord = null;
+			if (!output.containsKey(sample.getStartTime())) {
+				chord = new Chord();
+				output.put(sample.getStartTime(), chord);
+			} else {
+				chord = output.get(sample.getStartTime());
+			}
+			chord.add(sample);
+		}
+
+		for (HitObject ho : getHitObjectSection().getHitObjects()) {
+			Chord chord = null;
+			if (!output.containsKey(ho.getStartTime())) {
+				chord = new Chord();
+				output.put(ho.getStartTime(), chord);
+			} else {
+				chord = output.get(ho.getStartTime());
+			}
+			chord.add(ho);
+		}
+		return output;
+		
 	}
 	
 	public Beatmap clearHitsounds() {
@@ -133,16 +157,45 @@ public final class Beatmap {
 	@Override
 	public String toString() {
 
-		String output = "osu file format v" + OsuVersion + nl;
+		String output = "osu file format v" + OSU_VERSION + NEW_LINE;
 		for (Section section : sections) {
-			output += nl + section;
+			output += NEW_LINE + section;
 		}
 		return output;
 	}
+	
+	public void exportBeatmap(File file) throws IOException {
+		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))){
+			writer.write(toString());
+		} 
+	}
+	
+	public void copyHS(Beatmap source, boolean isKeysound) {
+		getTimingSection().copyTimings(source);
+		copyChords(source,isKeysound);
+	}
+	
+	private void copyChords(Beatmap source, boolean isKeysound){
+		Map<Long,Chord> targetChords = getChords();
+		Map<Long,Chord> sourceChords = source.getChords();
+		if (isKeysound){
+			for (Map.Entry<Long, Chord> entry : sourceChords.entrySet())
+			{
+				Chord chord = targetChords.get(entry.getKey());
+				if (chord != null) {
+					chord.copyHitsound(entry.getValue(), isKeysound);
+				}
+			}
+		} else {
+			for (Map.Entry<Long, Chord> entry : targetChords.entrySet())
+			{
+				Chord chord = sourceChords.get(entry.getKey());
+				if (chord != null) {
+					entry.getValue().copyHitsound(chord, isKeysound);
+				}
+			}
+		}
+	}
 
 	
-	public void copyHS(Set<Chord> targetChords) {
-		// TODO Auto-generated method stub
-		
-	}
 }

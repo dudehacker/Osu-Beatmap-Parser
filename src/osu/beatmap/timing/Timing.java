@@ -78,6 +78,12 @@ public class Timing {
 		}
 	};
 	
+	public void copyHitsound(Timing source){
+		setSetID(source.getSetID());
+		setVolume(source.getVolume());
+		setSampleSet(source.getSampleSet());
+	}
+	
 	public boolean isUnused(Timing previousTiming) {
 		if (!isInherited()) {
 			return false;
@@ -120,8 +126,7 @@ public class Timing {
 	}
 
 	public Timing clone(){
-		Timing t = new Timing(offset, mspb, meter, getSampleSet(), getSetID(), getVolume(), inherited, kiai);
-		return t;
+		return new Timing(offset, mspb, meter, getSampleSet(), getSetID(), getVolume(), inherited, kiai);
 	}
 	
 	public String toString(){

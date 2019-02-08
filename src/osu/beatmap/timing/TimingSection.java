@@ -2,23 +2,27 @@ package osu.beatmap.timing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
+import osu.beatmap.Beatmap;
 import osu.beatmap.BeatmapUtils;
 import osu.beatmap.Section;
 import osu.beatmap.hitobject.SampleSet;
 
-public final class TimingSection extends Section{
-	
+public final class TimingSection extends Section {
+
 	private List<Timing> timings;
-	
+
 	public TimingSection() {
 		super("[TimingPoints]");
 		timings = new ArrayList<>();
 	}
 
+	@Override
 	public void init(String[] lines) {
 		for (String line : lines) {
-			if (line.contains(",") ) {
+			if (line.contains(",")) {
 				String[] parts = line.split(",");
 				if (parts[0].contains(".")) {
 					parts[0] = parts[0].substring(0, parts[0].indexOf('.'));
@@ -39,11 +43,47 @@ public final class TimingSection extends Section{
 
 	@Override
 	public final String toString() {
-		return getHeader() + BeatmapUtils.nl
-				+ BeatmapUtils.convertListToString(timings) ;
+		return getHeader() + BeatmapUtils.nl + BeatmapUtils.convertListToString(timings);
 	}
 
 	public List<Timing> getTimingPoints() {
 		return timings;
+	}
+
+	public void copyTimings(Beatmap source) {
+
+		// only copy useful timing for default hitsounds to target difficulty
+		List<Timing> sourceTimings = source.getTimingSection().getTimingPoints();
+		Timing t1, t2;
+		for (Timing t : timings) {
+			for (int i = 0; i < sourceTimings.size() - 1; i++) {
+				if (i < sourceTimings.size() - 1) {
+					t1 = sourceTimings.get(i);
+					t2 = sourceTimings.get(i + 1);
+					if (t1.getOffset() <= t.getOffset() && t.getOffset() < t2.getOffset()) {
+						t.copyHitsound(t1);
+						break;
+					}
+				} else {
+					// last timing
+					t.copyHitsound(sourceTimings.get(i));
+				}
+			}
+		}
+
+		// add timings that exist in HS but not in target
+		Set<Long> offsets = new TreeSet<>();
+
+		for (Timing t_target : timings) {
+			offsets.add(t_target.getOffset());
+		}
+		
+		for (Timing t_source : sourceTimings) {
+			if (!offsets.contains(t_source.getOffset())) {
+				timings.add(t_source);
+			}
+		}
+
+		timings.sort(Timing.StartTimeComparator);
 	}
 }

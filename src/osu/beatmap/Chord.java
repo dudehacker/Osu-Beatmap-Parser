@@ -2,6 +2,7 @@ package osu.beatmap;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import osu.beatmap.event.Sample;
@@ -14,19 +15,19 @@ public class Chord {
 	private long startTime;
 
 	public Chord() {
-		list_HO = new ArrayList<HitObject>();
-		list_SB = new ArrayList<Sample>();
+		list_HO = new ArrayList<>();
+		list_SB = new ArrayList<>();
 		startTime = -1;
 	}
 	
-	public void copyHitsound(Chord source) {
-		
+	public void copyHitsound(Chord source, boolean copySB) {
+		//TODO
 	}
 
 	public long getStartTime() {
-		if (list_HO.size() > 0)
+		if (!list_HO.isEmpty())
 			return list_HO.get(0).getStartTime();
-		else if (list_SB.size() > 0)
+		else if (!list_SB.isEmpty())
 			return list_SB.get(0).getStartTime();
 		else
 			return -1;
@@ -75,9 +76,7 @@ public class Chord {
 
 	public boolean SbHasSoundWhenHoIsEmpty() {
 		if (list_HO.isEmpty()) {
-			if (!list_SB.isEmpty()) {
-				return true;
-			}
+			return (!list_SB.isEmpty());
 		}
 		return false;
 	}
@@ -102,7 +101,7 @@ public class Chord {
 		return false;
 	}
 
-	public void addALLSB(ArrayList<Sample> SB) {
+	public void addALLSB(List<Sample> SB) {
 		for (Sample s : SB) {
 			list_SB.add(s.clone());
 		}
@@ -123,7 +122,7 @@ public class Chord {
 		return list_HO.get(i);
 	}
 
-	public Chord Clone() {
+	public Chord clone() {
 		Chord newChord = new Chord();
 		for (HitObject ho : list_HO) {
 			newChord.add(ho.clone());

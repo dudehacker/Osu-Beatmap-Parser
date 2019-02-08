@@ -1,121 +1,32 @@
 package osu.beatmap;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import javax.swing.Action;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import osu.beatmap.Chord;
-import osu.beatmap.event.Sample;
-import osu.beatmap.hitobject.Addition;
 import osu.beatmap.hitobject.HitObject;
-import osu.beatmap.hitobject.HitsoundType;
-import osu.beatmap.hitobject.SampleSet;
-import osu.beatmap.timing.Timing;
 
 public class BeatmapUtils {
 
 	// Constants
-	public final static String nl = System.getProperty("line.separator");
+	public static final String nl = System.getProperty("line.separator");
 	// private static int SUPPORTED_OSU_FILE_VERSION=14;
-	private static int SUPPORTED_PLAY_MODE = 3; // Osu!mania only
-	public final static String defaultOsuPath = "C:/Program Files (x86)/osu!/Songs";
-	public final static String startPath = System.getProperty("user.dir");
-	
+	public static final String defaultOsuPath = "C:/Program Files (x86)/osu!/Songs";
+	public static final String startPath = System.getProperty("user.dir");
+
 	public static String doubleToIntString(Double doubleValue) {
 		return Double.toString(doubleValue).split(Pattern.quote(".0"))[0];
 	}
-	
-
-	public static Map<Long, Chord> convertToChordMapWithHitsound(List<HitObject> hitObjects, List<Sample> SB) {
-		Map<Long, Chord> output = new TreeMap<Long, Chord>();
-		for (Sample sample : SB) {
-			Chord chord = null;
-			if (!output.containsKey(sample.getStartTime())) {
-				chord = new Chord();
-				output.put(sample.getStartTime(), chord);
-			} else {
-				chord = output.get(sample.getStartTime());
-			}
-			chord.add(sample);
-		}
-
-		for (HitObject ho : hitObjects) {
-			Chord chord = null;
-			if (!output.containsKey(ho.getStartTime())) {
-				chord = new Chord();
-				output.put(ho.getStartTime(), chord);
-			} else {
-				chord = output.get(ho.getStartTime());
-			}
-			chord.add(ho);
-		}
-		return output;
-	}
-
-	public static void clearHitsounds(File f) {
-		String outputText = "";
-		boolean ho = false;
-		if (f == null || !(f.exists())) {
-			// error reading file
-		}
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"))) {
-			String line;
-
-			while ((line = br.readLine()) != null && ho == false) {
-				boolean read = true;
-				// read line by line
-				if (line.contains("Sample,")) {
-					// clear samples
-					read = false;
-				} else if (line.contains("HitObjects")) {
-					ho = true;
-				}
-
-				if (read) {
-					outputText += line + nl;
-				}
-			}
-			ArrayList<HitObject> HOs = getListOfHitObjects(f, false);
-			ArrayList<HitObject> newHOs = new ArrayList<HitObject>();
-			for (HitObject hitObject : HOs) {
-				HitObject newHO = hitObject.clone().clearHS();
-				newHOs.add(newHO);
-
-			}
-			outputText += convertListToString(newHOs);
-			exportBeatmap(f, outputText);
-
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	public static String convertListToString(List<?> al) {
-		if (al == null) return "";
+		if (al == null)
+			return "";
 		String output = "";
 		for (Object o : al) {
 			output += o.toString() + nl;
@@ -124,7 +35,7 @@ public class BeatmapUtils {
 	}
 
 	public static List<Long> getDistinctStartTime(List<HitObject> hitObjects, List<HitObject> hitObjects2) {
-		List<Long> output = new ArrayList<Long>();
+		List<Long> output = new ArrayList<>();
 		long t = -1;
 		for (HitObject ho : hitObjects) {
 			long startTime = ho.getStartTime();
@@ -147,7 +58,6 @@ public class BeatmapUtils {
 		return output;
 	}
 
-
 	public static File getOsuFile(String path) {
 		File f = null;
 		FileFilter filter = new FileNameExtensionFilter("OSU file", "osu");
@@ -162,54 +72,6 @@ public class BeatmapUtils {
 			f = jFileChooser1.getSelectedFile();
 		}
 		return f;
-	}
-
-	public static ArrayList<Timing> getTimingPoints(File f) throws Exception {
-		ArrayList<Timing> output = new ArrayList<Timing>();
-		if (f == null || !(f.exists())) {
-			// error reading file
-		}
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"))) {
-			String line;
-			int sectionID = 0;
-			while ((line = br.readLine()) != null) {
-				// read line by line
-				switch (sectionID) {
-				case 0:
-					// General stuff
-
-					if (line.equals("[TimingPoints]")) {
-						sectionID = 1;
-					}
-					break;
-				case 1:
-					// timing points
-					if (line.contains("[HitObjects]") || line.contains("[Colours]")) {
-						sectionID = 2;
-					} else if (!line.equals("")) {
-						String[] parts = line.split(",");
-						if (parts[0].contains(".")) {
-							parts[0] = parts[0].substring(0, parts[0].indexOf('.'));
-						}
-						long offset = Long.parseLong(parts[0]);
-						double mspb = Double.parseDouble(parts[1]);
-						int meter = Integer.parseInt(parts[2]);
-						SampleSet sampleSet = SampleSet.createSampleSet(Integer.parseInt(parts[3]));
-						int setID = Integer.parseInt(parts[4]);
-						int volume = Integer.parseInt(parts[5]);
-						int isInherited = Integer.parseInt(parts[6]);
-						int isKiai = Integer.parseInt(parts[7]);
-						Timing timing = new Timing(offset, mspb, meter, sampleSet, setID, volume, isInherited, isKiai);
-						output.add(timing);
-					}
-
-					break;
-
-				}
-			}
-		}
-
-		return output;
 	}
 
 	public static List<HitObject> getChordByTime(List<HitObject> hitObjects, long startTime) {
@@ -266,122 +128,6 @@ public class BeatmapUtils {
 			}
 		}
 		return size;
-	}
-
-	public static void exportBeatmap(File file, String outputText) {
-		BufferedWriter writer = null;
-
-		try {
-			// create a temporary file
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
-			writer.write(outputText);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				// Close the writer regardless of what happens...
-				writer.flush();
-				writer.close();
-			} catch (Exception e) {
-			}
-		}
-	}
-
-	public static ArrayList<HitObject> getListOfHitObjects(File f, boolean ignoreHitNormal) throws Exception {
-		ArrayList<HitObject> output = new ArrayList<>();
-		ArrayList<Timing> timingPoints = getTimingPoints(f);
-		if (f == null || !(f.exists())) {
-			// error reading file
-		}
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"))) {
-			String line;
-			int sectionID = 0;
-			while ((line = br.readLine()) != null) {
-				// read line by line
-				switch (sectionID) {
-				case 0:
-					// General stuff
-
-					if (line.contains("[HitObjects]")) {
-						sectionID = 1;
-					} else if (line.contains("Mode :")) {
-						int mode = Integer.parseInt(line.substring(6));
-						if (mode != SUPPORTED_PLAY_MODE) {
-							String errMsg = "The currently supported mode is mania";
-							JOptionPane.showMessageDialog(null, errMsg);
-							System.exit(-1);
-						}
-					}
-
-					break;
-				case 1:
-					// Hit OBject
-					if (line != null && line.contains(",")) {
-						String[] parts = line.split(Pattern.quote(","));
-						int x = Integer.parseInt(parts[0]);
-						long t = Long.parseLong(parts[2]);
-						int type = Integer.parseInt(parts[3]);
-						HitsoundType WFC = HitsoundType.createHitsoundType(Integer.parseInt(parts[4]));
-						int volume;
-						String wav;
-						String part5;
-						if (HitObject.isLN(type)) {
-							int firstColonIndex = parts[5].indexOf(':');
-							part5 = parts[5].substring(firstColonIndex + 1, parts[5].length());
-							// change LN to short note
-						} else {
-							// short note
-							part5 = parts[5];
-						}
-						volume = getVolumeFromFullHitSoundString(part5);
-						wav = getWavNameFromFullHitSoundString(part5);
-						SampleSet sampleSet = SampleSet.createSampleSet(Integer.parseInt(part5.substring(0, 1)));
-						Addition addition = Addition.createAddition(Integer.parseInt(part5.substring(2, 3)));
-
-						if (!wav.isEmpty()) {
-							HitObject hitObject = new HitObject(x, t, wav, volume, WFC, 0, addition, sampleSet);
-							hitObject.applyTimingPoint(timingPoints);
-							output.add(hitObject);
-						} else if (WFC != HitsoundType.HITNORMAL || !ignoreHitNormal) {
-
-							for (HitsoundType hitsoundType : WFC.split()) {
-								HitObject hitObject = new HitObject(x, t, wav, volume, hitsoundType, 0, addition,
-										sampleSet);
-								hitObject.applyTimingPoint(timingPoints);
-								output.add(hitObject);
-							}
-						}
-					}
-					break;
-				}
-			}
-		}
-		return output;
-	}
-
-	private static int getVolumeFromFullHitSoundString(String hs) {
-		int vol = 0;
-		try {
-
-			for (int i = 0; i < 3; i++) {
-				int index = hs.indexOf(':');
-				hs = hs.substring(index + 1, hs.length());
-			}
-			vol = Integer.parseInt(hs.substring(0, hs.indexOf(':')));
-		} catch (Exception e) {
-			System.out.println(hs + " caused an exception");
-		}
-		return vol;
-	}
-
-	private static String getWavNameFromFullHitSoundString(String hs) {
-		String output = "";
-		for (int i = 0; i < 3; i++) {
-			int index = hs.indexOf(':');
-			hs = hs.substring(index + 1, hs.length());
-		}
-		output = hs.substring(hs.indexOf(':') + 1, hs.length());
-		return output;
 	}
 
 }
