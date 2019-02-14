@@ -60,4 +60,8 @@ public class Sample {
 	public boolean isMuted() {
 		return volume == 0;
 	}
+
+	public int getVolume() {
+		return volume;
+	}
 }

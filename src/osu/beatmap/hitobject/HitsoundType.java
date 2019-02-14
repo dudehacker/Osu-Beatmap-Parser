@@ -30,6 +30,7 @@ public enum HitsoundType {
 		return value;
 	}
 
+	@Override
 	public String toString() {
 		return text;
 	}
@@ -44,6 +45,18 @@ public enum HitsoundType {
 		}
 
 		return 1;
+	}
+	
+	public static HitsoundType merge(HitsoundType ...types){
+		if (types.length <= 3){
+			int sum = 0;
+			for (HitsoundType hitsoundType : types) {
+				sum += hitsoundType.value;
+			}
+			return createHitsoundType(sum);
+		} else {
+			throw new IllegalArgumentException(types.toString());
+		}
 	}
 
 	public HitsoundType[] split() {

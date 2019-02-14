@@ -69,7 +69,7 @@ public class HitObject implements Cloneable {
 		this.ypos = hitObject.ypos;
 	}
 
-	public HitObject(String line) throws Exception {
+	public HitObject(String line) {
 		if (line != null && line.contains(",")) {
 			String[] parts = line.split(Pattern.quote(","));
 			xpos = Integer.parseInt(parts[0]);
@@ -92,7 +92,7 @@ public class HitObject implements Cloneable {
 			addition = Addition.createAddition(Integer.parseInt(part5.substring(2, 3)));
 
 		} else {
-			throw new Exception(line);
+			throw new IllegalArgumentException(line);
 		}
 	}
 
@@ -144,7 +144,7 @@ public class HitObject implements Cloneable {
 	}
 
 	public boolean hasDefault_HS() {
-		return whistle_finish_clap != HitsoundType.HITNORMAL && !hasCustom_HS();
+		return hasHitsound() && !hasCustom_HS();
 	}
 
 	public HitObject clone() {
@@ -334,14 +334,11 @@ public class HitObject implements Cloneable {
 				Timing tp2 = timingPoints.get(i + 1);
 				long t2 = tp2.getOffset();
 
-				if (t == t1) {
+				if (t1 <= t && t < t2) {
 					applyTimingPoint(tp1);
 					return;
 				} else if (t == t2) {
 					applyTimingPoint(tp2);
-					return;
-				} else if (t1 < t && t < t2) {
-					applyTimingPoint(tp1);
 					return;
 				}
 
@@ -372,15 +369,19 @@ public class HitObject implements Cloneable {
 		timingPointSetID = input.timingPointSetID;
 	}
 
+	public void copyHS(Sample sample) {
+		clearHS();
+		hitSound = sample.gethitSound();
+		volume = sample.getVolume();
+	}
+
 	public boolean isMuted() {
-		if (hasCustom_HS() && volume == 0) {
-			return true;
-		}
-		return false;
+		return (hasCustom_HS() && volume == 0);
+
 	}
 
 	public boolean hasHitsound() {
-		return hasCustom_HS() || whistle_finish_clap != HitsoundType.HITNORMAL;
+		return hasCustom_HS() || whistle_finish_clap != HitsoundType.HITNORMAL || sampleSet != SampleSet.AUTO || addition != Addition.AUTO;
 	}
 
 	public static Comparator<HitObject> ColumnComparator = new Comparator<HitObject>() {
@@ -392,5 +393,25 @@ public class HitObject implements Cloneable {
 			return (int) (c1 - c2);
 		}
 	};
+
+	public Addition getAddition() {
+		return addition;
+	}
+
+	public HitsoundType getHitsoundType() {
+		return whistle_finish_clap;
+	}
+
+	public void addWhistleFinishClap(int value) {
+		whistle_finish_clap = HitsoundType.createHitsoundType(whistle_finish_clap.getValue() + value);
+	}
+
+	public void addWhistleFinishClap(int value1, int value2) {
+		whistle_finish_clap = HitsoundType.createHitsoundType(whistle_finish_clap.getValue() + value1 + value2);
+	}
+
+	public void setHitsoundType(HitsoundType hitsoundType) {
+		whistle_finish_clap = hitsoundType;
+	}
 
 }
