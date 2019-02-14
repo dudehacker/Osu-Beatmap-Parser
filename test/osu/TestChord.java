@@ -75,7 +75,24 @@ public class TestChord {
 	}
 	
 	@Test
-	public void Test_CopyHS() {
+	public void Test_CopyHS_S3D_T1() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITCLAP, 0, Addition.AUTO, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITWHISTLE, 0, Addition.AUTO, SampleSet.NORMAL));
+		
+		
+		Chord target= new Chord();
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+
+		target.copyHitsound(source, false);
+		
+		assertEquals(source.getHitsounds().size(), 3);
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
+	public void Test_CopyHS_S2D_T1() {
 		Chord source = new Chord();
 		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
 		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITCLAP, 0, Addition.AUTO, SampleSet.NORMAL));
@@ -87,6 +104,21 @@ public class TestChord {
 		target.copyHitsound(source, false);
 		
 		assertEquals(source.getHitsounds().size(), 2);
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
+	public void Test_CopyHS_S1D_T1() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
+		
+		
+		Chord target= new Chord();
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+
+		target.copyHitsound(source, false);
+		
+		assertEquals(source.getHitsounds().size(), 1);
 		assertEquals(source.getHitsounds(), target.getHitsounds());
 	}
 	

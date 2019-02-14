@@ -64,9 +64,7 @@ public class Chord {
 					}
 					for (int j = targetSize; j < sourceSize; j++) {
 						HitObject source_ho = sourceChord.list_HO.get(j);
-						if (source_ho.toSample().toString().contains(".wav")) {
-							list_SB.addAll(source_ho.toSample());
-						}
+						list_SB.addAll(source_ho.toSample());
 					}
 					break;
 
@@ -97,81 +95,85 @@ public class Chord {
 			}
 		}
 	}
-	
-private void combineDefaultHS(List<HitObject> sourceChord, int n){
-		
-		ArrayList<HitObject> output = new ArrayList<>();
+
+	private void combineDefaultHS(List<HitObject> chord, int n) {
+		System.out.println("combining default hs: " + n);
+
+		@SuppressWarnings("unchecked")
+		List<HitObject> sourceChord = ((List<HitObject>) ((ArrayList<HitObject>) chord).clone());
+		List<HitObject> output = new ArrayList<>();
 		Collections.sort(sourceChord, HitObject.AdditionComparator);
 		int sourceSize = sourceChord.size();
 		int targetSize = list_HO.size();
 		HitObject source_ho1 = sourceChord.get(0);
 		HitObject source_ho2 = sourceChord.get(1);
 		HitObject newHO = source_ho1.clone();
-		if (n==2){
+		if (n == 2) {
 			if (newHO.getAddition() == source_ho2.getAddition()) {
 				newHO.setHitsoundType(HitsoundType.merge(newHO.getHitsoundType(), source_ho2.getHitsoundType()));
-				
+
 				HitObject target_ho1 = list_HO.get(0);
 				target_ho1.copyHS(newHO);
-				output.add( target_ho1);
-				for (int x = 0; x < n ; x++){
+				output.add(target_ho1);
+				for (int x = 0; x < n; x++) {
 					sourceChord.remove(0);
 				}
-				
-			} 
-			
-		} else if (n==3){
+
+			}
+
+		} else if (n == 3) {
 			HitObject source_ho3 = sourceChord.get(2);
-			if (source_ho3.getAddition() == source_ho2.getAddition() && source_ho2.getAddition() == source_ho1.getAddition()) {
-				newHO.setHitsoundType(HitsoundType.merge(source_ho2.getHitsoundType(),source_ho3.getHitsoundType()));
+			if (source_ho3.getAddition() == source_ho2.getAddition()
+					&& source_ho2.getAddition() == source_ho1.getAddition()) {
+				newHO.setHitsoundType(HitsoundType.merge(source_ho2.getHitsoundType(), source_ho3.getHitsoundType()));
 				HitObject target_ho1 = list_HO.get(0);
 				target_ho1.copyHS(newHO);
-				output.add( target_ho1);
-				for (int x = 0; x < n ; x++){
+				output.add(target_ho1);
+				for (int x = 0; x < n; x++) {
 					sourceChord.remove(0);
 				}
-				
-			} else if (source_ho1.getAddition()==source_ho2.getAddition()) {
+
+			} else if (source_ho1.getAddition() == source_ho2.getAddition()) {
 				newHO.setHitsoundType(HitsoundType.merge(source_ho2.getHitsoundType()));
-				
+
 				HitObject target_ho1 = list_HO.get(0);
 				target_ho1.copyHS(newHO);
-				output.add( target_ho1);
-				for (int x = 0; x < 2 ; x++){
+				output.add(target_ho1);
+				for (int x = 0; x < 2; x++) {
 					sourceChord.remove(0);
 				}
-				
-			} else if(source_ho2.getAddition() == source_ho3.getAddition()) {
+
+			} else if (source_ho2.getAddition() == source_ho3.getAddition()) {
 				newHO = source_ho2.clone();
 				newHO.setHitsoundType(HitsoundType.merge(newHO.getHitsoundType(), source_ho3.getHitsoundType()));
 				HitObject target_ho1 = list_HO.get(0);
 				target_ho1.copyHS(newHO);
-				output.add( target_ho1);
+				output.add(target_ho1);
 				sourceChord.remove(1);
 				sourceChord.remove(1);
-			} 
-			
+			}
+
 		} else {
 			throw new IllegalArgumentException();
 		}
 
 		// copy rest of hitsounds
 		try {
-		if (sourceChord.size()>0 && list_HO.size()>=0){
-			for (int i = 0; i<list_HO.size();i++){
-				HitObject source_ho = sourceChord.get(i);
-				HitObject target_ho = list_HO.get(i);
-				target_ho.copyHS(source_ho);
-				output.add(target_ho);
+			if (sourceChord.size() > 0 && list_HO.size() >= 0) {
+				for (int i = 0; i < list_HO.size(); i++) {
+					HitObject source_ho = sourceChord.get(i);
+					HitObject target_ho = list_HO.get(i);
+					target_ho.copyHS(source_ho);
+					output.add(target_ho);
+				}
+				for (int j = list_HO.size(); j < sourceChord.size(); j++) {
+					HitObject source_ho = sourceChord.get(j);
+					list_SB.addAll(source_ho.toSample());
+				}
+
 			}
-			for (int j = list_HO.size(); j < sourceChord.size(); j++){
-				HitObject source_ho = sourceChord.get(j);
-				list_SB.addAll(source_ho.toSample());
-			}
-			
-		}
-		
-		} catch (Exception e){
+
+		} catch (Exception e) {
 			System.out.println(n + " targetsize " + targetSize + " source size " + sourceSize);
 			e.printStackTrace();
 		}

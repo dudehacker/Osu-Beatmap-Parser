@@ -27,4 +27,8 @@ public enum Addition {
 		}
 		throw new IllegalArgumentException("Invalid value :" + value);
 	}
+
+	public SampleSet toSampleSet() {
+		return SampleSet.createSampleSet(text);
+	}
 }

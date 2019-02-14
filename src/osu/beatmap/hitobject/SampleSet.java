@@ -12,6 +12,7 @@ public enum SampleSet {
 	}
 	
 	public static SampleSet createSampleSet(String value) {
+		value = value.trim();
 		if (value.equalsIgnoreCase("none")) {
 			return AUTO;
 		}

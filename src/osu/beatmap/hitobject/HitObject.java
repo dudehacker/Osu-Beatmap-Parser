@@ -216,9 +216,7 @@ public class HitObject implements Cloneable {
 			return false;
 		if (whistle_finish_clap != other.whistle_finish_clap)
 			return false;
-		if (xpos != other.xpos)
-			return false;
-		return true;
+		return (xpos == other.xpos);
 	}
 
 	public List<Sample> toSample() {
@@ -243,13 +241,6 @@ public class HitObject implements Cloneable {
 			}
 
 			tempHS = getEffectiveSampleSet().toString() + "-";
-
-			// Apply Addition
-			if (whistle_finish_clap != HitsoundType.HITNORMAL) {
-				if (addition != Addition.AUTO) {
-					tempHS = addition.toString() + "-";
-				}
-			}
 
 			// Apply Hitsound Type
 			if (whistle_finish_clap.toString() == null) { // split
@@ -282,6 +273,12 @@ public class HitObject implements Cloneable {
 	}
 
 	private SampleSet getEffectiveSampleSet() {
+		// Addition
+		if (whistle_finish_clap != HitsoundType.HITNORMAL && addition != Addition.AUTO) {
+			return addition.toSampleSet();
+		}
+
+		// Timing Point SampleSet
 		if (sampleSet == SampleSet.AUTO && !hasCustom_HS()) {
 			return timingPointSampleSet;
 		} else {
@@ -381,7 +378,8 @@ public class HitObject implements Cloneable {
 	}
 
 	public boolean hasHitsound() {
-		return hasCustom_HS() || whistle_finish_clap != HitsoundType.HITNORMAL || sampleSet != SampleSet.AUTO || addition != Addition.AUTO;
+		return hasCustom_HS() || whistle_finish_clap != HitsoundType.HITNORMAL || sampleSet != SampleSet.AUTO
+				|| addition != Addition.AUTO;
 	}
 
 	public static Comparator<HitObject> ColumnComparator = new Comparator<HitObject>() {

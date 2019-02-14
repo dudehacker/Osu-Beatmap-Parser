@@ -1,5 +1,7 @@
 package osu.beatmap.hitobject;
 
+import java.util.Arrays;
+
 public enum HitsoundType {
 	HITNORMAL(0, "hitnormal"), HITWHISTLE(2,"hitwhistle"), HITFINISH(4,"hitfinish"), HITCLAP(8,"hitclap"), HITWHISTLE_FINISH(6), HITWHISTLE_CLAP(
 			10), HITWHISTLE_FINISH_CLAP(14), HITFINISH_CLAP(12);
@@ -55,7 +57,7 @@ public enum HitsoundType {
 			}
 			return createHitsoundType(sum);
 		} else {
-			throw new IllegalArgumentException(types.toString());
+			throw new IllegalArgumentException(Arrays.toString(types));
 		}
 	}
 
