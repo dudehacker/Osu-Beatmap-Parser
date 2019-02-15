@@ -244,7 +244,7 @@ public class HitObject implements Cloneable {
 
 			// Apply Hitsound Type
 			if (whistle_finish_clap.toString() == null) { // split
-				for (HitsoundType type : whistle_finish_clap.split()) {
+				for (HitsoundType type : whistle_finish_clap.splitAll()) {
 					output.add(new Sample(startTime, tempHS + type.toString() + id + ".wav", getEffectiveVolume()));
 				}
 			} else {

@@ -61,7 +61,7 @@ public enum HitsoundType {
 		}
 	}
 
-	public HitsoundType[] split() {
+	public HitsoundType[] splitAll() {
 		int size = getNumberOfHitsounds();
 		HitsoundType[] output = new HitsoundType[size];
 
