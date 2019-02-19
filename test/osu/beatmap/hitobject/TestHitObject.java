@@ -28,6 +28,23 @@ public class TestHitObject {
 	}
 	
 	@Test
+	public void test_Sort_HS_Sampleset(){
+		HitObject ho1 = new HitObject(0, 0, null, 0, HitsoundType.HITWHISTLE, 0, Addition.DRUM, SampleSet.AUTO);
+		HitObject ho2 = new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.SOFT);
+		
+		List<HitObject> actual = new ArrayList<>();
+		actual.add(ho1);
+		actual.add(ho2);
+		actual.sort(HitObject.HitsoundComparator);
+		
+		List<HitObject> expected = new ArrayList<>();
+		expected.add(ho2);
+		expected.add(ho1);
+		
+		assertEquals(expected, actual);
+	}
+	
+	@Test
 	public void test_Sort_HS_SetID(){
 		HitObject ho1 = new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 2, Addition.AUTO, SampleSet.AUTO);
 		HitObject ho2 = new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.AUTO);

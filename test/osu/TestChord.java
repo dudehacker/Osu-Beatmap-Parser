@@ -95,6 +95,24 @@ public class TestChord {
 	}
 	
 	@Test
+	public void Test_CopyHS_S3D_2Unorder_T1() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.DRUM, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITCLAP, 0, Addition.SOFT, SampleSet.NORMAL));
+		HitObject ho_add = new HitObject(0, 0, null, 0, HitsoundType.HITWHISTLE, 0, Addition.DRUM, SampleSet.SOFT);
+		source.add(ho_add);
+		
+		Chord target= new Chord();
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+
+		target.copyHitsound(source, false);
+		assertEquals(3,source.getHitsounds().size());
+		assertEquals(3,target.getHitsounds().size());
+		assertEquals(1,target.getSB().size());
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
 	public void Test_CopyHS_S3DW2A_T1() {
 		Chord source = new Chord();
 		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
@@ -144,6 +162,25 @@ public class TestChord {
 		target.copyHitsound(source, false);
 		assertEquals(3,source.getHitsounds().size());
 		assertEquals(3,target.getHitsounds().size());
+		assertEquals(0,target.getSB().size());
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
+	public void Test_CopyHS_S3D_T2() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITCLAP, 0, Addition.AUTO, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITWHISTLE, 0, Addition.AUTO, SampleSet.NORMAL));
+		
+		Chord target= new Chord();
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+
+		target.copyHitsound(source, false);
+		assertEquals(3,source.getHitsounds().size());
+		assertEquals(3,target.getHitsounds().size());
+		assertEquals(0,target.getSB().size());
 		assertEquals(source.getHitsounds(), target.getHitsounds());
 	}
 	

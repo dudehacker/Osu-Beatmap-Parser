@@ -312,17 +312,26 @@ public class HitObject implements Cloneable {
 		@Override
 		public int compare(HitObject ho1, HitObject ho2) {
 			int x1 = 0 , x2 = 0; 
-			if (ho1.hasCustom_HS()){
-				x1 = 10;
+			if (ho1.getEffectiveSampleSet() != SampleSet.AUTO){
+				x1 = ho1.getEffectiveSampleSet().getValue();
 			}
-			if (ho2.hasCustom_HS()){
-				x2 = 10;
+
+			if (ho2.getEffectiveSampleSet() != SampleSet.AUTO){
+				x2 = ho2.getEffectiveSampleSet().getValue();
 			}
+			
 			if (ho1.getEffectiveSetID() > 1){
 				x1 = 5;
 			}
 			if (ho2.getEffectiveSetID() > 1){
 				x2 = 5;
+			}
+			
+			if (ho1.hasCustom_HS()){
+				x1 = 10;
+			}
+			if (ho2.hasCustom_HS()){
+				x2 = 10;
 			}
 			
 			/* For ascending order */

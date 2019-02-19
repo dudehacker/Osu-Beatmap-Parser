@@ -117,7 +117,7 @@ public class Chord {
 	}
 
 	private void combineDefaultHS(List<HitObject> chord, int n) {
-		System.out.println("combining default hs: " + n);
+//		System.out.println("combining default hs: " + n);
 		int targetIndex = 0;
 		@SuppressWarnings("unchecked")
 		List<HitObject> sourceChord = ((List<HitObject>) ((ArrayList<HitObject>) chord).clone());
