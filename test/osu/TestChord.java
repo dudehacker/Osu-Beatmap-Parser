@@ -87,7 +87,6 @@ public class TestChord {
 		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
 
 		target.copyHitsound(source, false);
-		System.out.println(target);
 		assertEquals(3,source.getHitsounds().size());
 		assertEquals(3,target.getHitsounds().size());
 		assertEquals(2,target.getSB().size());
@@ -139,13 +138,55 @@ public class TestChord {
 		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITCLAP, 0, Addition.AUTO, SampleSet.NORMAL));
 		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITWHISTLE, 0, Addition.AUTO, SampleSet.NORMAL));
 		
-		
 		Chord target= new Chord();
 		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
 
 		target.copyHitsound(source, false);
 		assertEquals(3,source.getHitsounds().size());
 		assertEquals(3,target.getHitsounds().size());
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
+	public void Test_CopyHS_S1_Normal_T1() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+		Chord target= new Chord();
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+		target.copyHitsound(source, false);
+		assertEquals(1,source.getHitsounds().size());
+		assertEquals(1,target.getHitsounds().size());
+		assertEquals(0,target.getSB().size());
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
+	public void Test_CopyHS_S2D_T0() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITCLAP, 0, Addition.AUTO, SampleSet.NORMAL));
+		Chord target= new Chord();
+
+		target.copyHitsound(source, false);
+		assertEquals(2,source.getHitsounds().size());
+		assertEquals(0,target.getHitsounds().size());
+		assertEquals(0,target.getSB().size());
+		assertNotEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
+	public void Test_CopyHS_S2D_T0_True() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITCLAP, 0, Addition.AUTO, SampleSet.NORMAL));
+		Chord target= new Chord();
+
+		target.copyHitsound(source, true);
+		assertEquals(2,source.getHitsounds().size());
+		assertEquals(2,target.getHitsounds().size());
+		assertEquals(2,target.getSB().size());
 		assertEquals(source.getHitsounds(), target.getHitsounds());
 	}
 	
@@ -162,6 +203,23 @@ public class TestChord {
 		target.copyHitsound(source, false);
 		
 		assertEquals(source.getHitsounds().size(), 2);
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+
+	@Test
+	public void Test_CopyHS_S2Dup_T1() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
+		
+		Chord target= new Chord();
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+
+		target.copyHitsound(source, false);
+		
+		assertEquals(1, source.getHitsounds().size());
+		assertEquals(1, target.getHitsounds().size());
 		assertEquals(source.getHitsounds(), target.getHitsounds());
 	}
 	

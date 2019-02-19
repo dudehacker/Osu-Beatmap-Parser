@@ -3,6 +3,7 @@ package osu.beatmap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -21,8 +22,25 @@ public class Chord {
 		list_SB = new ArrayList<>();
 		startTime = -1;
 	}
+	
+	public Chord removeDuplicateHS(){
+		Set<String> set = new HashSet<>();
+		Iterator<HitObject> ite = list_HO.iterator();
+		while (ite.hasNext()){
+			HitObject ho = ite.next();
+			for (String s : ho.toHitsoundString()){
+				if (set.contains(s)){
+					ite.remove();
+				} else {
+					set.add(s);
+				}
+			}
+		}
+		return this;
+	}
 
-	public void copyHitsound(Chord sourceChord, boolean copySB) {
+	public Chord copyHitsound(Chord sourceChord, boolean copySB) {
+		sourceChord.removeDuplicateHS();
 		Collections.sort(sourceChord.list_HO,HitObject.HitsoundComparator);
 		int sourceSize = sourceChord.list_HO.size();
 		int targetSize = list_HO.size();
@@ -95,6 +113,7 @@ public class Chord {
 				target_ho.copyHS(source_ho);
 			}
 		}
+		return this;
 	}
 
 	private void combineDefaultHS(List<HitObject> chord, int n) {
