@@ -11,6 +11,56 @@ import java.util.List;
 public class TestHitObject {
 	
 	@Test
+	public void test_Sort_X_Position(){
+		HitObject ho1 = new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 2, Addition.SOFT, SampleSet.AUTO);
+		HitObject x = new HitObject(100, 0, null, 0, HitsoundType.HITNORMAL, 2, Addition.DRUM, SampleSet.AUTO);
+		
+		List<HitObject> actual = new ArrayList<>();
+		actual.add(x);
+		actual.add(ho1);
+		actual.sort(HitObject.ColumnComparator);
+		
+		List<HitObject> expected = new ArrayList<>();
+		expected.add(ho1);
+		expected.add(x);
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void test_Sort_Addition(){
+		HitObject ho1 = new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 2, Addition.SOFT, SampleSet.AUTO);
+		HitObject x = new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 2, Addition.DRUM, SampleSet.AUTO);
+		
+		List<HitObject> actual = new ArrayList<>();
+		actual.add(x);
+		actual.add(ho1);
+		actual.sort(HitObject.AdditionComparator);
+		
+		List<HitObject> expected = new ArrayList<>();
+		expected.add(ho1);
+		expected.add(x);
+		
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void test_Sort_StartTime(){
+		HitObject ho1 = new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 2, Addition.AUTO, SampleSet.AUTO);
+		HitObject x = new HitObject(0, 100, "kick.wav", 80, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.AUTO);
+		
+		List<HitObject> actual = new ArrayList<>();
+		actual.add(x);
+		actual.add(ho1);
+		actual.sort(HitObject.StartTimeComparator);
+		
+		List<HitObject> expected = new ArrayList<>();
+		expected.add(ho1);
+		expected.add(x);
+		
+		assertEquals(expected, actual);
+	}
+	
+	@Test
 	public void test_Sort_HS_X(){
 		HitObject ho1 = new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 2, Addition.AUTO, SampleSet.AUTO);
 		HitObject x = new HitObject(0, 0, "kick.wav", 80, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.AUTO);

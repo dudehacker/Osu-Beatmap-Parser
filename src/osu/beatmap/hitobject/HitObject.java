@@ -297,16 +297,12 @@ public class HitObject implements Cloneable {
 		return "" + xpos + "," + ypos + "," + startTime + "," + type + "," + whistle_finish_clap.getValue() + ","
 				+ endLN + ":" + sampleSet.getValue() + ":" + addition.getValue() + ":0:" + volume + ":" + hitSound;
 	}
-
-	public static Comparator<HitObject> StartTimeComparator = new Comparator<HitObject>() {
-		@Override
-		public int compare(HitObject ho1, HitObject ho2) {
-			long t1 = ho1.startTime;
-			long t2 = ho2.startTime;
-			/* For ascending order */
-			return (int) (t1 - t2);
-		}
-	};
+	
+	public static Comparator<HitObject> ColumnComparator = Comparator.comparing(HitObject::getXposition);
+	
+	public static Comparator<HitObject> StartTimeComparator = Comparator.comparing(HitObject::getStartTime);
+	
+	public static Comparator<HitObject> AdditionComparator = Comparator.comparing(HitObject::getAddition);
 	
 	public static Comparator<HitObject> HitsoundComparator = new Comparator<HitObject>() {
 		@Override
@@ -339,18 +335,12 @@ public class HitObject implements Cloneable {
 		}
 	};
 
-	public static Comparator<HitObject> AdditionComparator = new Comparator<HitObject>() {
-		@Override
-		public int compare(HitObject ho1, HitObject ho2) {
-			int a1 = ho1.addition.getValue();
-			int a2 = ho2.addition.getValue();
-			/* For ascending order */
-			return a1 - a2;
-		}
-	};
-
 	public long getStartTime() {
 		return startTime;
+	}
+	
+	public int getXposition(){
+		return xpos;
 	}
 
 	public void applyTimingPoint(List<Timing> timingPoints) {
@@ -412,16 +402,6 @@ public class HitObject implements Cloneable {
 		return hasCustom_HS() || whistle_finish_clap != HitsoundType.HITNORMAL || sampleSet != SampleSet.AUTO
 				|| addition != Addition.AUTO;
 	}
-
-	public static Comparator<HitObject> ColumnComparator = new Comparator<HitObject>() {
-		@Override
-		public int compare(HitObject n1, HitObject n2) {
-			long c1 = n1.xpos;
-			long c2 = n2.xpos;
-			/* For ascending order */
-			return (int) (c1 - c2);
-		}
-	};
 
 	public Addition getAddition() {
 		return addition;
