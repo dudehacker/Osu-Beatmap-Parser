@@ -23,6 +23,7 @@ public class Chord {
 	}
 
 	public void copyHitsound(Chord sourceChord, boolean copySB) {
+		Collections.sort(sourceChord.list_HO,HitObject.HitsoundComparator);
 		int sourceSize = sourceChord.list_HO.size();
 		int targetSize = list_HO.size();
 
@@ -69,7 +70,7 @@ public class Chord {
 					break;
 
 				case 2: // Combine both default hitsounds into 1 HitObject
-					System.out.println("source size 2 at " + startTime);
+					// System.out.println("source size 2 at " + startTime);
 					combineDefaultHS(sourceChord.list_HO, 2);
 					break;
 
@@ -98,59 +99,53 @@ public class Chord {
 
 	private void combineDefaultHS(List<HitObject> chord, int n) {
 		System.out.println("combining default hs: " + n);
-
+		int targetIndex = 0;
 		@SuppressWarnings("unchecked")
 		List<HitObject> sourceChord = ((List<HitObject>) ((ArrayList<HitObject>) chord).clone());
-		List<HitObject> output = new ArrayList<>();
-		Collections.sort(sourceChord, HitObject.AdditionComparator);
-		int sourceSize = sourceChord.size();
-		int targetSize = list_HO.size();
 		HitObject source_ho1 = sourceChord.get(0);
 		HitObject source_ho2 = sourceChord.get(1);
 		HitObject newHO = source_ho1.clone();
 		if (n == 2) {
 			if (newHO.getAddition() == source_ho2.getAddition()) {
 				newHO.setHitsoundType(HitsoundType.merge(newHO.getHitsoundType(), source_ho2.getHitsoundType()));
-
 				HitObject target_ho1 = list_HO.get(0);
 				target_ho1.copyHS(newHO);
-				output.add(target_ho1);
 				for (int x = 0; x < n; x++) {
 					sourceChord.remove(0);
 				}
-
+				targetIndex++;
 			}
 
 		} else if (n == 3) {
 			HitObject source_ho3 = sourceChord.get(2);
 			if (source_ho3.getAddition() == source_ho2.getAddition()
 					&& source_ho2.getAddition() == source_ho1.getAddition()) {
-				newHO.setHitsoundType(HitsoundType.merge(source_ho2.getHitsoundType(), source_ho3.getHitsoundType()));
+				newHO.setHitsoundType(HitsoundType.merge(source_ho1.getHitsoundType(), source_ho2.getHitsoundType(),
+						source_ho3.getHitsoundType()));
 				HitObject target_ho1 = list_HO.get(0);
 				target_ho1.copyHS(newHO);
-				output.add(target_ho1);
 				for (int x = 0; x < n; x++) {
 					sourceChord.remove(0);
 				}
+				targetIndex++;
 
 			} else if (source_ho1.getAddition() == source_ho2.getAddition()) {
-				newHO.setHitsoundType(HitsoundType.merge(source_ho2.getHitsoundType()));
-
+				newHO.setHitsoundType(HitsoundType.merge(source_ho1.getHitsoundType(), source_ho2.getHitsoundType()));
 				HitObject target_ho1 = list_HO.get(0);
 				target_ho1.copyHS(newHO);
-				output.add(target_ho1);
 				for (int x = 0; x < 2; x++) {
 					sourceChord.remove(0);
 				}
+				targetIndex++;
 
 			} else if (source_ho2.getAddition() == source_ho3.getAddition()) {
 				newHO = source_ho2.clone();
 				newHO.setHitsoundType(HitsoundType.merge(newHO.getHitsoundType(), source_ho3.getHitsoundType()));
 				HitObject target_ho1 = list_HO.get(0);
 				target_ho1.copyHS(newHO);
-				output.add(target_ho1);
 				sourceChord.remove(1);
 				sourceChord.remove(1);
+				targetIndex++;
 			}
 
 		} else {
@@ -158,25 +153,18 @@ public class Chord {
 		}
 
 		// copy rest of hitsounds
-		try {
-			if (sourceChord.size() > 0 && list_HO.size() >= 0) {
-				for (int i = 0; i < list_HO.size(); i++) {
-					HitObject source_ho = sourceChord.get(i);
-					HitObject target_ho = list_HO.get(i);
-					target_ho.copyHS(source_ho);
-					output.add(target_ho);
-				}
-				for (int j = list_HO.size(); j < sourceChord.size(); j++) {
-					HitObject source_ho = sourceChord.get(j);
-					list_SB.addAll(source_ho.toSample());
-				}
-
+		while (sourceChord.size() > 0) {
+			HitObject source_ho = sourceChord.get(0);
+			if (targetIndex < list_HO.size()) {
+				HitObject target_ho = list_HO.get(targetIndex);
+				target_ho.copyHS(source_ho);
+				targetIndex++;
+			} else {
+				list_SB.addAll(source_ho.toSample());
 			}
-
-		} catch (Exception e) {
-			System.out.println(n + " targetsize " + targetSize + " source size " + sourceSize);
-			e.printStackTrace();
+			sourceChord.remove(0);
 		}
+
 	}
 
 	private int getDefaultHitsoundSize() {
@@ -282,6 +270,10 @@ public class Chord {
 			startTime = s.getStartTime();
 		}
 		list_SB.add(s);
+	}
+
+	public List<Sample> getSB() {
+		return list_SB;
 	}
 
 	public HitObject getHitObjectByIndex(int i) {

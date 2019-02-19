@@ -75,6 +75,64 @@ public class TestChord {
 	}
 	
 	@Test
+	public void Test_CopyHS_S3DW3A_T1() {
+		Chord source = new Chord();
+		HitObject x = new HitObject(0, 0, "kick.wav", 80, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.AUTO);
+		source.add(x);
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITCLAP, 0, Addition.SOFT, SampleSet.NORMAL));
+		HitObject ho_add = new HitObject(0, 0, null, 0, HitsoundType.HITWHISTLE, 0, Addition.DRUM, SampleSet.SOFT);
+		source.add(ho_add);
+		
+		Chord target= new Chord();
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+
+		target.copyHitsound(source, false);
+		System.out.println(target);
+		assertEquals(3,source.getHitsounds().size());
+		assertEquals(3,target.getHitsounds().size());
+		assertEquals(2,target.getSB().size());
+		assertNotEquals(x,target.getHitObjectByIndex(0));
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
+	public void Test_CopyHS_S3DW2A_T1() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITCLAP, 0, Addition.SOFT, SampleSet.NORMAL));
+		HitObject ho_add = new HitObject(0, 0, null, 0, HitsoundType.HITWHISTLE, 0, Addition.DRUM, SampleSet.SOFT);
+		source.add(ho_add);
+		
+		Chord target= new Chord();
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+
+		target.copyHitsound(source, false);
+		assertEquals(3,source.getHitsounds().size());
+		assertEquals(3,target.getHitsounds().size());
+		assertEquals(2,target.getSB().size());
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
+	public void Test_CopyHS_S3DW1A_T1() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITCLAP, 0, Addition.AUTO, SampleSet.NORMAL));
+		HitObject ho_add = new HitObject(0, 0, null, 0, HitsoundType.HITWHISTLE, 0, Addition.DRUM, SampleSet.NORMAL);
+		source.add(ho_add);
+		
+		Chord target= new Chord();
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+
+		target.copyHitsound(source, false);
+		assertEquals(3,source.getHitsounds().size());
+		assertEquals(3,target.getHitsounds().size());
+		assertEquals(1,target.getSB().size());
+		assertEquals(ho_add.toHitsoundString().iterator().next(),target.getSB().get(0).gethitSound());
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
 	public void Test_CopyHS_S3D_T1() {
 		Chord source = new Chord();
 		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
@@ -86,8 +144,8 @@ public class TestChord {
 		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
 
 		target.copyHitsound(source, false);
-		
-		assertEquals(source.getHitsounds().size(), 3);
+		assertEquals(3,source.getHitsounds().size());
+		assertEquals(3,target.getHitsounds().size());
 		assertEquals(source.getHitsounds(), target.getHitsounds());
 	}
 	
@@ -112,6 +170,34 @@ public class TestChord {
 		Chord source = new Chord();
 		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITFINISH, 0, Addition.AUTO, SampleSet.NORMAL));
 		
+		
+		Chord target= new Chord();
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+
+		target.copyHitsound(source, false);
+		
+		assertEquals(source.getHitsounds().size(), 1);
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
+	public void Test_CopyHS_S1_HitNormal_Sampleset_T1() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.DRUM));
+		
+		Chord target= new Chord();
+		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));
+
+		target.copyHitsound(source, false);
+		
+		assertEquals(source.getHitsounds().size(), 1);
+		assertEquals(source.getHitsounds(), target.getHitsounds());
+	}
+	
+	@Test
+	public void Test_CopyHS_S1_HitNormal_Sampleset_Addition_T1() {
+		Chord source = new Chord();
+		source.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.SOFT, SampleSet.DRUM));
 		
 		Chord target= new Chord();
 		target.add(new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.NORMAL));

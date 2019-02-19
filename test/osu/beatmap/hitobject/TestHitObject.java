@@ -5,7 +5,44 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TestHitObject {
+	
+	@Test
+	public void test_Sort_HS_X(){
+		HitObject ho1 = new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 2, Addition.AUTO, SampleSet.AUTO);
+		HitObject x = new HitObject(0, 0, "kick.wav", 80, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.AUTO);
+		
+		List<HitObject> actual = new ArrayList<>();
+		actual.add(x);
+		actual.add(ho1);
+		actual.sort(HitObject.HitsoundComparator);
+		
+		List<HitObject> expected = new ArrayList<>();
+		expected.add(ho1);
+		expected.add(x);
+		
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void test_Sort_HS_SetID(){
+		HitObject ho1 = new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 2, Addition.AUTO, SampleSet.AUTO);
+		HitObject ho2 = new HitObject(0, 0, null, 0, HitsoundType.HITNORMAL, 0, Addition.AUTO, SampleSet.AUTO);
+		
+		List<HitObject> actual = new ArrayList<>();
+		actual.add(ho1);
+		actual.add(ho2);
+		actual.sort(HitObject.HitsoundComparator);
+		
+		List<HitObject> expected = new ArrayList<>();
+		expected.add(ho2);
+		expected.add(ho1);
+		
+		assertEquals(expected, actual);
+	}
 	
 	@Test
 	public void test_Is_LN(){

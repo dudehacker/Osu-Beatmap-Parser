@@ -307,6 +307,28 @@ public class HitObject implements Cloneable {
 			return (int) (t1 - t2);
 		}
 	};
+	
+	public static Comparator<HitObject> HitsoundComparator = new Comparator<HitObject>() {
+		@Override
+		public int compare(HitObject ho1, HitObject ho2) {
+			int x1 = 0 , x2 = 0; 
+			if (ho1.hasCustom_HS()){
+				x1 = 10;
+			}
+			if (ho2.hasCustom_HS()){
+				x2 = 10;
+			}
+			if (ho1.getEffectiveSetID() > 1){
+				x1 = 5;
+			}
+			if (ho2.getEffectiveSetID() > 1){
+				x2 = 5;
+			}
+			
+			/* For ascending order */
+			return x1 - x2;
+		}
+	};
 
 	public static Comparator<HitObject> AdditionComparator = new Comparator<HitObject>() {
 		@Override
